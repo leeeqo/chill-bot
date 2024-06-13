@@ -17,10 +17,14 @@ repositories {
 }
 
 dependencies {
-    //implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa
+    //implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.0.0")
+
 
     // Dev
     developmentOnly("org.springframework.boot:spring-boot-devtools")
@@ -39,6 +43,19 @@ dependencies {
     //implementation("org.springframework.amqp:spring-amqp")
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-amqp
     implementation("org.springframework.boot:spring-boot-starter-amqp")
+
+    // https://mvnrepository.com/artifact/org.postgresql/postgresql
+    //implementation("org.postgresql:postgresql:42.3.10")
+    implementation("org.postgresql:postgresql")
+
+    // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+    implementation("javax.xml.bind:jaxb-api:2.3.1")
+
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+    runtimeOnly("org.postgresql:postgresql")
 
     // Test
     testImplementation(platform("org.junit:junit-bom:5.9.1"))

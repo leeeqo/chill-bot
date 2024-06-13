@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  postgres:
+    image: 'postgres'
+    container_name: 'postgres-chill-bot'
+    ports:
+      - "5432:5432"
+    environment:
+      - 'POSTGRES_USER=oli'
+      - 'POSTGRES_HOST_AUTH_METHOD=trust'
+      - 'POSTGRES_DB=postgres-chill-bot'

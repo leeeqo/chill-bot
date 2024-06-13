@@ -4,8 +4,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ChillBotApplication
+class ChillBotDispatcherApplication
 
 fun main(args: Array<String>) {
-	runApplication<ChillBotApplication>(*args)
+	runApplication<ChillBotDispatcherApplication>(*args)
 }
