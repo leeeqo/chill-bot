@@ -32,14 +32,6 @@ class TelegramBot(
         }
 
         updateController.processUpdate(update)
-
-        // For testing bot
-        /*update.message.let {
-            sendAnswerMessage(SendMessage.builder()
-                .chatId(it.chatId)
-                .text(it.text)
-                .build())
-        }*/
     }
 
     fun sendAnswerMessage(sendMessage: SendMessage) {

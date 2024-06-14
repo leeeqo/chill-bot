@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update
 class UpdateProducerImpl(
     private val rabbitTemplate: RabbitTemplate,
 ): UpdateProducer {
+
     override fun produce(queue: String, update: Update) {
         rabbitTemplate.convertAndSend(queue, update)
     }
