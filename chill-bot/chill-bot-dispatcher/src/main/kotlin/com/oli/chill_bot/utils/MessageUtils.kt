@@ -7,29 +7,30 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 
 fun Update.generateSendMessageWithText(text: String): SendMessage = SendMessage.builder()
-        .chatId(message.chatId)
-        .text(text)
-        .build()
+    .chatId(message.chatId)
+    .text(text)
+    .build()
 
 fun Update.generateSendMessageWithOptionsAndHeader(
-        header: String,
-        options: List<String>,
+    header: String,
+    options: List<String>,
 ): SendMessage = SendMessage.builder()
-        .chatId(message.chatId)
-        .text(header)
-        .replyMarkup(generateKeyboardWithOptions(options))
-        .build()
+    .chatId(message.chatId)
+    .text(header)
+    .replyMarkup(generateKeyboardWithOptions(options))
+    .build()
 
 
 fun generateKeyboardWithOptions(options: List<String>): ReplyKeyboardMarkup {
-        val rows = mutableListOf<KeyboardRow>()
+    val rows = mutableListOf<KeyboardRow>()
 
-        for (option in options) {
-                val row = KeyboardRow()
-                row.add(KeyboardButton(option))
+    for (option in options) {
+        val row = KeyboardRow()
+        row.add(KeyboardButton(option))
 
-                rows.add(row)
-        }
+        rows.add(row)
+    }
 
-        return ReplyKeyboardMarkup(rows)
+    return ReplyKeyboardMarkup(rows)
 }
+

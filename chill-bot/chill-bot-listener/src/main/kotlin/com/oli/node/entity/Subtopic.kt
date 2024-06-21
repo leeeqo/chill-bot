@@ -1,9 +1,11 @@
 package com.oli.node.entity
 
-//import jakarta.persistence.*
+import jakarta.persistence.*
+import kotlinx.serialization.Serializable
 
-/*@Entity
+@Entity
 @Table(name = "subtopic")
+@Serializable
 data class Subtopic(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,6 +14,10 @@ data class Subtopic(
     @Column(name = "name")
     val name: String,
 
-    @Column(name = "topic_id")
-    val topicId: Long,
-)*/
+    @ManyToOne
+    @JoinColumn(name = "topic_id")
+    val topic: Topic,
+
+    @OneToMany(mappedBy = "subtopic", cascade = [CascadeType.ALL])
+    val questions: List<Question> = listOf()
+)

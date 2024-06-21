@@ -1,26 +1,40 @@
 package com.oli.node.service.impl
 
 import com.oli.node.dao.TopicDAO
-import com.oli.node.entity.Topic
 import com.oli.node.service.MainService
 import com.oli.node.service.ProducerService
+import com.oli.node.service.modeServices.InterviewPrepareService
+import com.oli.node.state.Mode.PREPARE_FOR_INTERVIEW
+import com.oli.node.utils.defineModeByText
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
+
+private val kLogger = KotlinLogging.logger {}
 
 @Service
 class MainServiceImpl(
     private val topicDAO: TopicDAO,
-    private val producerService: ProducerService
+    private val producerService: ProducerService,
+    private val interviewPrepareService: InterviewPrepareService
 ) : MainService {
 
-    override fun processTextMessage(update: Update) {
-        val topics = getAllTopics()
+    override fun processTextMessage(update: Update) {//, session: Session) {
+        //val topics = getAllTopics()
 
-        println("NUM OF TOPICS = ${topics.size}")
+        //val mode = session.
+        val mode = defineModeByText(update.message!!.text!!)
+
+        when (mode) {
+            PREPARE_FOR_INTERVIEW -> interviewPrepareService.processInterviewPrepareMessage(update)//, session)
+
+            //MORE_MORE_SLEEP -> TO_DO
+
+            //UNDEFINED -> TO_DO
+            else -> {
+                kLogger.info { "In ELSE branch in MainService" }
+            }
+        }
 
         /*val message = update.message
         val sendMessage = SendMessage.builder()
@@ -33,7 +47,7 @@ class MainServiceImpl(
             val keyBoardButton: KeyboardButton = KeyboardButton(topic.name ?: "STRING IS NULL")
             kr.add(keyBoardButton)
         }
-        val replyKeyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(listOf(kr))*/
+        val replyKeyboard: ReplyKeyboardMarkup = ReplyKeyboardMarkup(listOf(kr))
 
         val rows = mutableListOf<KeyboardRow>()
         for (topic in topics) {
@@ -42,9 +56,11 @@ class MainServiceImpl(
             val button: KeyboardButton = KeyboardButton(topic?.name ?: "EMPTY")
             buttonsInRow.add(button)
             rows.add(buttonsInRow)
-        }
+        }*/
 
-        val replyKeyboardMarkup = ReplyKeyboardMarkup(rows)
+        /*val replyKeyboardMarkup = generateInlineKeyboardWithOptions(topics.stream().map { //generateReplyKeyboardWithOptions(topics.stream().map {
+            it?.name ?: "Ooops, topic has no name("
+        }.toList())//ReplyKeyboardMarkup(rows)
 
 
         val sendMessage = SendMessage.builder()
@@ -53,7 +69,7 @@ class MainServiceImpl(
             .text("Num rows in topic = ${topics.size}")
             .build()
 
-        producerService.producerAnswer(sendMessage)
+        producerService.producerAnswer(sendMessage)*/
 
         //producerService.produceAnswerWithKeyboard(replyKeyboard)
     }
@@ -64,5 +80,5 @@ class MainServiceImpl(
         rawDataDAO.save(rawData)
     }*/
 
-    private fun getAllTopics(): List<Topic> = topicDAO.findAll()
+    //private fun getAllTopics(): List<Topic> = topicDAO.findAll()
 }

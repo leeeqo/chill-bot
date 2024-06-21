@@ -14,6 +14,7 @@ version = "0.0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -40,12 +41,26 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-amqp
     implementation("org.springframework.boot:spring-boot-starter-amqp")
 
+    // REDIS
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    // Serialization
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-serialization-json-jvm
+    runtimeOnly("org.jetbrains.kotlinx:kotlinx-serialization-json-jvm:1.7.0")
+
     // Test
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Commands
+    // https://mvnrepository.com/artifact/org.telegram/telegrambotsextensions
+    implementation("org.telegram:telegrambots-extensions:7.2.1")
+    //implementation("com.github.ndanhkhoi:simple-telegram-command-bot-spring-boot-starter:2023.08.21")
+
 }
 
 tasks.withType<KotlinCompile> {

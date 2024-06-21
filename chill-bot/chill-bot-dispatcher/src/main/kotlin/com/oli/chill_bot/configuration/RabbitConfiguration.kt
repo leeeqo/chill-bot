@@ -15,12 +15,17 @@ class RabbitConfiguration (
     val topicListQueueVal: String,
     @Value("\${spring.rabbitmq.queues.answer-message}")
     val answerMessageQueueVal: String,
+    @Value("\${spring.rabbitmq.queues.answer-message-with-keyboard}")
+    val answerMessageQueueWithKeyboardVal: String,
 ) {
     @Bean
     fun topicListQueue(): Queue = Queue(topicListQueueVal)
 
     @Bean
     fun answerMessageQueue(): Queue = Queue(answerMessageQueueVal)
+
+    @Bean
+    fun answerMessageWithKeyboardQueue(): Queue = Queue(answerMessageQueueWithKeyboardVal)
 
     @Bean
     fun jsonMessageConverter(): MessageConverter = Jackson2JsonMessageConverter()
