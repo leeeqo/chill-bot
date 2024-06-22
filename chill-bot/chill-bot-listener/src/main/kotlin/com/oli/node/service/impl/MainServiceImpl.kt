@@ -1,5 +1,6 @@
 package com.oli.node.service.impl
 
+import com.oli.node.dao.SessionRepository
 import com.oli.node.dao.TopicDAO
 import com.oli.node.service.MainService
 import com.oli.node.service.ProducerService
@@ -16,14 +17,49 @@ private val kLogger = KotlinLogging.logger {}
 class MainServiceImpl(
     private val topicDAO: TopicDAO,
     private val producerService: ProducerService,
-    private val interviewPrepareService: InterviewPrepareService
+    private val interviewPrepareService: InterviewPrepareService,
+    private val sessionRepository: SessionRepository
 ) : MainService {
 
     override fun processTextMessage(update: Update) {//, session: Session) {
         //val topics = getAllTopics()
 
         //val mode = session.
-        val mode = defineModeByText(update.message!!.text!!)
+        //val mode = defineModeByText(update.message!!.text!!)
+
+        val chatId = update.message.chatId.toString()
+
+        kLogger.debug {
+            "In MainService: \n\n" +
+            "CHAT_ID = $chatId"
+        }
+        /*val mode = sessionRepository.findById(chatId)
+            .ifPresentOrElse({session -> session.mode}, {
+                defineModeByText(update.message!!.text!!)
+            })*/
+        val currSession = sessionRepository.findById(chatId)
+
+        kLogger.debug {
+            "Is there session in Redis? = ${currSession.isPresent}"
+        }
+
+        if (currSession.isPresent) {
+            kLogger.debug {
+                "Session: $currSession"
+            }
+        }
+
+        val mode = if (currSession.isPresent) {
+            currSession.get().mode
+        } else {
+            defineModeByText(update.message!!.text!!)
+        }
+        //val mode = sessionRepository.findById(chatId)
+
+        if (update.message.text == "/end" && currSession.isPresent) {
+            sessionRepository.delete(currSession.get())
+            return
+        }
 
         when (mode) {
             PREPARE_FOR_INTERVIEW -> interviewPrepareService.processInterviewPrepareMessage(update)//, session)
@@ -81,4 +117,33 @@ class MainServiceImpl(
     }*/
 
     //private fun getAllTopics(): List<Topic> = topicDAO.findAll()
+
+    /*fun getCurrentSession(update: Update): Session {
+        val chatId = update.message!!.chatId.toString()
+
+        //val serializedSession = redisTemplate.opsForValue().get(chatId) ?:
+        //    Json.encodeToString(createNewSession(update))
+
+        //val retrievedSession =
+
+        //kLogger.info { "JSON<Session>.toString() = $retrievedSession" }
+
+        return sessionRepository.findById(chatId).orElse(createNewSession(update))
+        //return Json.decodeFromString<Session>(serializedSession)
+        //return redisTemplate.opsForValue().get(chatId) ?: createNewSession(update)
+    }*/
+
+    /*fun createNewSession(update: Update): Session {
+        val message = update.message!!
+        val chatId = update.message!!.chatId.toString()
+        val mode = defineModeByText(message.text)
+        val session = Session(chatId, mode, 0, InterviewSession())
+
+        //val serializedSession = Json.encodeToString(session)
+
+        //redisTemplate.opsForValue().set(chatId, serializedSession)
+
+        return sessionRepository.save(session)
+        //return session
+    }*/
 }

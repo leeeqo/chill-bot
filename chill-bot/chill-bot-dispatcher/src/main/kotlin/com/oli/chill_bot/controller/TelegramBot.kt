@@ -26,6 +26,7 @@ class TelegramBot(
     private val telegramClient = OkHttpTelegramClient(token)
     override val listOfCommands: List<BotCommand> = listOf(
         BotCommand("/start", "Start bot"),
+        BotCommand("/end", "End session"),
         BotCommand("/help", "Bot info")
     )
 

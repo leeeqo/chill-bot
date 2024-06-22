@@ -1,11 +1,16 @@
 package com.oli.node.state
 
-import kotlinx.serialization.Serializable
+import org.springframework.data.redis.core.RedisHash
+import kotlin.random.Random
 
-@Serializable
+//@Serializable
+@RedisHash("Session")
 data class Session (
-    val chatId: String,
+    val id: String,
+    //val chatId: String,
     val mode: Mode,
-    val stage: Int,
-    val sessionMode: SessionMode
+    var stage: Int,
+    val sessionMode: SessionMode,
+    //val randomFactory: RandomFactory = RandomFactory(id)
+    val random: Random = Random(id.hashCode())
 )

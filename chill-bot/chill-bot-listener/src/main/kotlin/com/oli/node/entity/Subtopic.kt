@@ -1,23 +1,22 @@
 package com.oli.node.entity
 
 import jakarta.persistence.*
-import kotlinx.serialization.Serializable
 
 @Entity
 @Table(name = "subtopic")
-@Serializable
+//@Serializable
 data class Subtopic(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
+    val id: Long = 0L,
 
     @Column(name = "name")
-    val name: String,
+    val name: String = "",
 
-    @ManyToOne
+    @ManyToOne//(fetch = FetchType.EAGER)
     @JoinColumn(name = "topic_id")
-    val topic: Topic,
+    val topic: Topic = Topic(),
 
-    @OneToMany(mappedBy = "subtopic", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "subtopic", cascade = [CascadeType.ALL], fetch = FetchType.EAGER)
     val questions: List<Question> = listOf()
 )

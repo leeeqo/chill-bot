@@ -3,6 +3,7 @@ package com.oli.chill_bot.controller
 import com.oli.chill_bot.configuration.RabbitConfiguration
 import com.oli.chill_bot.service.UpdateProducer
 import com.oli.chill_bot.utils.generateSendMessageWithOptionsAndHeader
+import com.oli.chill_bot.utils.generateSendMessageWithRemoveKeyboard
 import com.oli.chill_bot.utils.generateSendMessageWithText
 import mu.KotlinLogging
 import org.springframework.stereotype.Controller
@@ -59,8 +60,8 @@ class UpdateController (
                     generateSendMessageWithOptionsAndHeader(
                         WHAT_TO_DO,
                         listOf(
-                            PREPARE_FOR_INTERVIEW
-                            //MORE_MORE_SLEEP,
+                            PREPARE_FOR_INTERVIEW,
+                            //MORE_MORE_SLEEP
                         )
                     )
                 )
@@ -73,7 +74,13 @@ class UpdateController (
 
                 HELP -> generateSendMessageWithText("We haven't written documentation yet(")
 
-                END -> generateSendMessageWithText("Goodbye!")
+                END -> {
+                    setView(
+                        //generateSendMessageWithText("Goodbye!")
+                        generateSendMessageWithRemoveKeyboard("Session ended")
+                    )
+                    toProducer()
+                }
 
                 else -> toProducer()
             }

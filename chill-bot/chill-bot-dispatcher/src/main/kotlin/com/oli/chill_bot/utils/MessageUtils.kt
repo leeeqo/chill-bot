@@ -3,6 +3,7 @@ package com.oli.chill_bot.utils
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
 
@@ -34,3 +35,8 @@ fun generateKeyboardWithOptions(options: List<String>): ReplyKeyboardMarkup {
     return ReplyKeyboardMarkup(rows)
 }
 
+fun Update.generateSendMessageWithRemoveKeyboard(text: String): SendMessage = SendMessage.builder()
+    .chatId(message.chatId)
+    .replyMarkup(ReplyKeyboardRemove(true))
+    .text(text)
+    .build()
