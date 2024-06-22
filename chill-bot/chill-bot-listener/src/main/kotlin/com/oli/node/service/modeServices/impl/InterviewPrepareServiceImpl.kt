@@ -6,8 +6,7 @@ import com.oli.node.dao.QuestionDAO
 import com.oli.node.dao.SessionRepository
 import com.oli.node.dao.SubtopicDAO
 import com.oli.node.dao.TopicDAO
-import com.oli.node.entity.Subtopic
-import com.oli.node.entity.Topic
+import com.oli.node.entity.Question
 import com.oli.node.service.ProducerService
 import com.oli.node.service.modeServices.InterviewPrepareService
 import com.oli.node.state.InterviewSession
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard
-import kotlin.random.Random
 
 private val kLogger = KotlinLogging.logger {}
 
@@ -73,124 +71,55 @@ class InterviewPrepareServiceImpl(
         val replyKeyboard: ReplyKeyboard
         val text: String
 
-        var topicToSession: Topic
-        var subtopicToSession: Subtopic
-
         if (currSession.stage == 0) {//interviewSession.topic == null) {
-            val topics = topicDAO.findAll()
-            //val topicNames = topics.stream().map { it.name }.toList()
-
-            replyKeyboard = generateReplyKeyboardWithOptions(topics.stream().map {
-                it?.name ?: "Ooops, topic has no name("
-            }.toList())
-
-            //replyKeyboard = processTopic()
+            replyKeyboard = processTopic()
 
             text = "Choose topic"
-
-            /*println("INFO ABOUT SESSION:")
-            println("SessionId = ${currSession.id}")
-            println("SessionStage = ${currSession.stage}")
-            println("SessionMode = ${currSession.mode}")
-            println("SessionInterview = ${currSession.sessionMode}")
-
-            println("INFO ABOUT INTERVIEW_SESSION:")
-            println("SessionId = ${interviewSession.topic}")*/
         } else if (currSession.stage == 1) {//(interviewSession.subtopic == null) {
-
-            println("IN IF == 1 BLOCK")
             val topicName = update.message.text
 
-            println("TOPIC = $topicName")
-
-            // TO_DO - write code responsible for distinct topic/subtopic names
-            val topic = topicDAO.findAllByName(topicName).last()
-            //val topic = topicDAO.findAllByName(topicName)//.last()
-
-            //interviewSession.topic = topic
-            topicToSession = topic
-
-            /*println("TOPIC_OBJECT = $topic")
-
-            println("INFO ABOUT SESSION:")
-            println("SessionId = ${currSession.id}")
-            println("SessionStage = ${currSession.stage}")
-            println("SessionMode = ${currSession.mode}")
-            println("SessionInterview = ${currSession.sessionMode}")*/
-
-            //println("INFO ABOUT INTERVIEW_SESSION:")
-            //println("SessionId = ${interviewSession.topic}")
-
-            val subtopics = subtopicDAO.findAllByTopic(topic)
-
-            replyKeyboard = generateReplyKeyboardWithOptions(subtopics.stream().map {
-                it?.name ?: "Ooops, topic has no name("
-            }.toList())
+            replyKeyboard = processSubtopic(topicName)
 
             text = "Choose subtopic"
 
-            //currSession.stage++
-            //sessionRepository.save(currSession)
-
-            //replyKeyboard = generateReplyKeyboardWithOptions(listOf("ku"))
-            //text = "ku"
-        } else {
+            currSession.sessionMode.topic = topicName
+        } else if (currSession.stage == 2) {
             val subtopicName = update.message.text
 
-            val subtopic = subtopicDAO.findAllByName(subtopicName).last()
+            //val questionsIds = currSession.sessionMode.questions.toList()   //currSession.sessionMode.getIdOfQuestions().toList()
 
-            //interviewSession.subtopic = subtopic
-            subtopicToSession = subtopic
+            //text = processQuestion(subtopicName, 2, questionsIds)
+            val questionOrNull = processQuestionFirstTime(subtopicName)
+            text = questionOrNull?.text ?: "There are no questions for this subtopic"
 
-            var numQuestionsBySubtopic = questionDAO.countBySubtopic(subtopic)
+            replyKeyboard = generateReplyKeyboardWithOptions(listOf(
+                "Good",
+                "It must be repeated",
+                "Don't know"
+            ))
 
-            numQuestionsBySubtopic += (2 - currSession.stage)
-
-            if (numQuestionsBySubtopic == 0L) {
-                replyKeyboard = generateReplyKeyboardWithOptions(listOf(
-                    "Good",
-                    "It must be repeated",
-                    "Don't know"
-                ))
-
-                //text = "kuku"
-                text = "All the questions were shown for this subtopic"
-            } else {
-                var randomQuestionId: Long
-                do {
-                    randomQuestionId = Random.nextLong(numQuestionsBySubtopic)
-                    //currSession.random.nextLong(numQuestionsBySubtopic)
-                } while (randomQuestionId in interviewSession.getIdOfQuestions())
-
-                val question = questionDAO.findById(randomQuestionId)
-
-                replyKeyboard = generateReplyKeyboardWithOptions(listOf(
-                    "Good",
-                    "It must be repeated",
-                    "Don't know"
-                ))
-
-                //text = "kuku"
-                text = question.get().text
+            currSession.sessionMode.subtopic = subtopicName
+            if (questionOrNull != null) {
+                currSession.sessionMode.questions.add(questionOrNull.id)
             }
 
+        } else {
+            val subtopicName = currSession.sessionMode.subtopic!!
 
+            val questionsIds = currSession.sessionMode.questions.toList() //currSession.sessionMode.getIdOfQuestions().toList()
 
-            /*interviewSession.questions.add(question.get())
-            sessionRepository.save(currSession)*/
+            val questionOrNull = processQuestion(subtopicName, questionsIds)
+            text = questionOrNull?.text ?: "There is no more questions for this subtopic"
 
-            //val numQuestionsBySubtopic = questionDAO.count()
-            //val randQuestionId = currSession.random.nextInt()
-            //replyKeyboard = generateReplyKeyboardWithOptions(listOf("We haven't added questions yet("))
+            replyKeyboard = generateReplyKeyboardWithOptions(listOf(
+                "Good",
+                "It must be repeated",
+                "Don't know"
+            ))
 
-            //text = "We are sorry!"
-            /*val questions = questionDAO.findAll()
-
-            generateReplyKeyboardWithOptions(questions.stream().map {
-                it?.text ?: "Ooops, topic has no name("
-            }.toList())
-
-            text = "Answer question"*/
+            if (questionOrNull != null) {
+                currSession.sessionMode.questions.add(questionOrNull.id)
+            }
         }
 
         //val replyKeyboardMarkup = generateInlineKeyboardWithOptions(listOf("TO_DO"))//topics.stream().map { //generateReplyKeyboardWithOptions(topics.stream().map {
@@ -260,25 +189,44 @@ class InterviewPrepareServiceImpl(
     }
 
     @Transactional
-    fun processQuestion(subtopicName: String, stage: Int, questionsIds: List<Long>): String {
-        val subtopic = subtopicDAO.findAllByName(subtopicName).last()
+    fun processQuestionFirstTime(subtopicName: String): Question? {
+        /*val subtopic = subtopicDAO.findAllByName(subtopicName).last()
 
-        var numQuestionsBySubtopic = questionDAO.countBySubtopic(subtopic)
-
-        numQuestionsBySubtopic += (2 - stage)
+        val numQuestionsBySubtopic = questionDAO.countBySubtopic(subtopic)
 
         return if (numQuestionsBySubtopic == 0L) {
-            "All the questions were shown for this subtopic"
+            null
         } else {
-            var randomQuestionId: Long
-            do {
-                randomQuestionId = Random.nextLong(numQuestionsBySubtopic)
-                //currSession.random.nextLong(numQuestionsBySubtopic)
-            } while (randomQuestionId in questionsIds)
+            val randomQuestionId = Random.nextLong(numQuestionsBySubtopic)
 
             val question = questionDAO.findById(randomQuestionId)
 
-            question.get().text
-        }
+            question.get()
+        }*/
+
+        val questions = questionDAO.findRandBySubtopic(subtopicName)
+
+        return if (questions.isEmpty()) null else questions[0]
+    }
+
+    @Transactional
+    fun processQuestion(subtopicName: String, questionIds: List<Long>): Question? {
+        /*val subtopic = subtopicDAO.findAllByName(subtopicName).last()
+
+        val questions = questionDAO.findAllBySubtopicExceptAlreadyAsked(subtopicName, questionIds)
+
+        val numLeftQuestions = questions.size
+
+        return if (numLeftQuestions == 0) {
+            null
+        } else {
+            val randomQuestionId = Random.nextInt(numLeftQuestions)
+
+            questions[randomQuestionId]
+        }*/
+
+        val questions = questionDAO.findRandBySubtopicExceptAlreadyAsked(subtopicName, questionIds)
+
+        return if (questions.isEmpty()) null else questions[0]
     }
 }
