@@ -11,21 +11,16 @@ import java.util.*
 
 @Configuration
 class RabbitConfiguration (
-    @Value("\${spring.rabbitmq.queues.topic-list-request}")
-    val topicListQueueVal: String,
+    @Value("\${spring.rabbitmq.queues.update-request}")
+    val updateRequestQueueVal: String,
     @Value("\${spring.rabbitmq.queues.answer-message}")
-    val answerMessageQueueVal: String,
-    @Value("\${spring.rabbitmq.queues.answer-message-with-keyboard}")
-    val answerMessageQueueWithKeyboardVal: String,
+    val answerMessageQueueVal: String
 ) {
     @Bean
-    fun topicListQueue(): Queue = Queue(topicListQueueVal)
+    fun updateRequestQueue(): Queue = Queue(updateRequestQueueVal)
 
     @Bean
     fun answerMessageQueue(): Queue = Queue(answerMessageQueueVal)
-
-    @Bean
-    fun answerMessageWithKeyboardQueue(): Queue = Queue(answerMessageQueueWithKeyboardVal)
 
     @Bean
     fun jsonMessageConverter(): MessageConverter = Jackson2JsonMessageConverter()

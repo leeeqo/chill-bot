@@ -79,6 +79,6 @@ class UpdateController (
     }
 
     fun Update.toProducer() {
-        updateProducer.produce(rabbitConfiguration.topicListQueueVal, this)
+        updateProducer.produce(rabbitConfiguration.updateRequestQueueVal, this)
     }
 }

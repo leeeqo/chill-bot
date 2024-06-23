@@ -18,7 +18,7 @@ class ConsumerServiceImpl(
     private val interviewPrepareService: InterviewPrepareService
 ) : ConsumerService {
 
-    @RabbitListener(queues = ["\${spring.rabbitmq.queues.topic-list-request}"])
+    @RabbitListener(queues = ["\${spring.rabbitmq.queues.update-request}"])
     override fun consumeRequests(update: Update) {
         kLogger.debug("NODE: received message")
 
