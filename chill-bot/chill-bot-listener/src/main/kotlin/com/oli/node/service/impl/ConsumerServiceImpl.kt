@@ -21,17 +21,7 @@ class ConsumerServiceImpl(
     override fun consumeTopicListRequests(update: Update) {
         kLogger.debug("NODE: received message")
 
-        /*val message = update.message!!
-        val chatId = message.chatId.toString()
 
-        val session = redisTemplate.opsForValue().get(chatId) ?: createNewSession(chatId, message)
-
-        if (session == null) {
-            val mode = defineModeByText(message.text)
-
-            session = Session(chatId, mode, 0, InterviewSession())
-            redisTemplate.opsForValue().set(chatId, session)
-        }*/
 
         mainService.processTextMessage(update)//, session)
     }

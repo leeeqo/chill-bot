@@ -1,7 +1,6 @@
 package com.oli.node.state
 
 import org.springframework.data.redis.core.RedisHash
-import kotlin.random.Random
 
 //@Serializable
 @RedisHash("Session")
@@ -12,5 +11,5 @@ data class Session (
     var stage: Int,
     val sessionMode: SessionMode,
     //val randomFactory: RandomFactory = RandomFactory(id)
-    val random: Random = Random(id.hashCode())
+    //val random: Random = Random(id.hashCode())
 )

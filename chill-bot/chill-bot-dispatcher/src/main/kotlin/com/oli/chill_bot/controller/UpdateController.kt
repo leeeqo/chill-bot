@@ -76,7 +76,6 @@ class UpdateController (
 
                 END -> {
                     setView(
-                        //generateSendMessageWithText("Goodbye!")
                         generateSendMessageWithRemoveKeyboard("Session ended")
                     )
                     toProducer()
@@ -96,8 +95,4 @@ class UpdateController (
     fun Update.toProducer() {
         updateProducer.produce(rabbitConfiguration.topicListQueueVal, this)
     }
-
-    //fun Update.processKeyboardMessage() {
-    //    updateProducer.produceOnKeyboard(this)
-    //}
 }
