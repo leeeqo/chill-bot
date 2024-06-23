@@ -5,18 +5,7 @@ import org.springframework.boot.Banner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.builder.SpringApplicationBuilder
 
-
-//import org.springframework.data.jpa.repository.config.EnableJpaRepositories
-
-//@EnableJpaRepositories("com.oli.node.*")
-//@EntityScan("com.oli.*")
-//@ComponentScan("co,.oli.*")
-//@Configuration
 @SpringBootApplication
-/*@EnableAutoConfiguration(exclude = [
-    DataSourceAutoConfiguration::class,
-    DataSourceTransactionManagerAutoConfiguration::class,
-    HibernateJpaAutoConfiguration::class])*/
 class ChillBotListenerApplication/*(
     val applicationContext: ApplicationContext,
 ) : CommandLineRunner {

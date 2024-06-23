@@ -13,6 +13,4 @@ class UpdateProducerImpl(
     override fun produce(queue: String, update: Update) {
         rabbitTemplate.convertAndSend(queue, update)
     }
-
-    //override fun produceOnKeyboard(update: Update) {}
 }

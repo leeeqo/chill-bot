@@ -21,7 +21,6 @@ class UpdateController (
 
     companion object {
         private const val UNSUPPORTED_MESSAGE_TYPE = "Unsupported message type"
-        private const val UNSUPPORTED_TEXT = "Unsupported text"
 
         private const val START = "/start"
         private const val END = "/end"
@@ -30,7 +29,6 @@ class UpdateController (
         private const val WHAT_TO_DO = "What would you like to do?"
         private const val PREPARE_FOR_INTERVIEW = "Let's prepare for an interview!"
         private const val MORE_MORE_SLEEP = "Let's go sleep, I'm done!"
-        private const val GOOD_NIGHT = "Good night! See you soon!"
     }
 
     fun registerBot(telegramBot: TelegramBot) {
@@ -41,14 +39,6 @@ class UpdateController (
         if (!update.hasMessage()) {
             kLogger.error { UNSUPPORTED_MESSAGE_TYPE + update }
         }
-
-        println("Update has callBackQuery? : ${update.callbackQuery ?: "No!"}")
-
-        println("Message: ${update.message}")
-        println("CHAT_ID = ${update.message.chatId}")
-        println("It has text? : ${update.message?.text ?: "No, it doesn't"}")
-        println("It has replyMarkup? : ${update.message?.replyMarkup ?: "No, it doesn't"}")
-        println("Entities? : ${update.message?.entities ?: "No, it doesn't"}")
 
         distributeMessagesByType(update)
     }
@@ -66,13 +56,9 @@ class UpdateController (
                     )
                 )
 
-                /*PREPARE_FOR_INTERVIEW -> toProducer()//processTopicListMessage()
-
-                MORE_MORE_SLEEP -> setView(
-                    generateSendMessageWithText(GOOD_NIGHT)
-                )*/
-
-                HELP -> generateSendMessageWithText("We haven't written documentation yet(")
+                HELP -> setView(
+                    generateSendMessageWithText("We haven't written documentation yet(")
+                )
 
                 END -> {
                     setView(

@@ -12,15 +12,6 @@ fun Update.generateSendMessageWithText(text: String): SendMessage = SendMessage.
     .text(text)
     .build()
 
-fun Update.generateSendMessageWithOptionsAndHeader(
-    header: String,
-    options: List<String>,
-): SendMessage = SendMessage.builder()
-    .chatId(message.chatId)
-    .text(header)
-    .replyMarkup(generateKeyboardWithOptions(options))
-    .build()
-
 
 fun generateKeyboardWithOptions(options: List<String>): ReplyKeyboardMarkup {
     val rows = mutableListOf<KeyboardRow>()
@@ -34,6 +25,17 @@ fun generateKeyboardWithOptions(options: List<String>): ReplyKeyboardMarkup {
 
     return ReplyKeyboardMarkup(rows)
 }
+
+
+fun Update.generateSendMessageWithOptionsAndHeader(
+    header: String,
+    options: List<String>,
+): SendMessage = SendMessage.builder()
+    .chatId(message.chatId)
+    .text(header)
+    .replyMarkup(generateKeyboardWithOptions(options))
+    .build()
+
 
 fun Update.generateSendMessageWithRemoveKeyboard(text: String): SendMessage = SendMessage.builder()
     .chatId(message.chatId)

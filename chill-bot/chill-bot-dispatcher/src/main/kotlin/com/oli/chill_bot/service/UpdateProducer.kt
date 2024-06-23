@@ -4,6 +4,4 @@ import org.telegram.telegrambots.meta.api.objects.Update
 
 interface UpdateProducer {
     fun produce(queue: String, update: Update)
-
-    //fun produceOnKeyboard(update: Update)
 }

@@ -1,11 +1,12 @@
 package com.oli.node.service.impl
 
+import com.oli.node.dao.SessionRepository
 import com.oli.node.service.ConsumerService
-import com.oli.node.service.MainService
-import com.oli.node.state.Session
+import com.oli.node.service.modeServices.InterviewPrepareService
+import com.oli.node.state.Mode.PREPARE_FOR_INTERVIEW
+import com.oli.node.utils.defineModeByText
 import mu.KotlinLogging
 import org.springframework.amqp.rabbit.annotation.RabbitListener
-import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
 import org.telegram.telegrambots.meta.api.objects.Update
 
@@ -13,35 +14,36 @@ private val kLogger = KotlinLogging.logger {}
 
 @Service
 class ConsumerServiceImpl(
-    private val mainService: MainService,
-    private val redisTemplate: RedisTemplate<String, Session>
+    private val sessionRepository: SessionRepository,
+    private val interviewPrepareService: InterviewPrepareService
 ) : ConsumerService {
 
     @RabbitListener(queues = ["\${spring.rabbitmq.queues.topic-list-request}"])
-    override fun consumeTopicListRequests(update: Update) {
+    override fun consumeRequests(update: Update) {
         kLogger.debug("NODE: received message")
 
+        val chatId = update.message.chatId.toString()
+        val currSession = sessionRepository.findById(chatId)
 
+        val mode = if (currSession.isPresent) {
+            currSession.get().mode
+        } else {
+            defineModeByText(update.message.text)
+        }
 
-        mainService.processTextMessage(update)//, session)
+        if (update.message.text == "/end" && currSession.isPresent) {
+            sessionRepository.delete(currSession.get())
+            return
+        }
+
+        when (mode) {
+            PREPARE_FOR_INTERVIEW -> interviewPrepareService.processInterviewPrepareMessage(update)//, session)
+
+            //MORE_MORE_SLEEP -> TO_DO
+
+            else -> {
+                kLogger.info { "In ELSE branch in MainService" }
+            }
+        }
     }
-
-    /*@RabbitListener(queues = ["\${spring.rabbitmq.queues.doc-message-update}"])
-    override fun consumeDocMessageUpdates(update: Update) {
-        kLogger.debug("NODE: Doc message is received")
-    }
-
-    @RabbitListener(queues = ["\${spring.rabbitmq.queues.photo-message-update}"])
-    override fun consumePhotoMessageUpdates(update: Update) {
-        kLogger.debug("NODE: Photo message is received")
-    }*/
-
-    /*private fun createNewSession(chatId: String, message: Message): Session {
-        val mode = defineModeByText(message.text)
-        val session = Session(chatId, mode, 0, InterviewSession())
-
-        redisTemplate.opsForValue().set(chatId, session)
-
-        return session
-    }*/
 }

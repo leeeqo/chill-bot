@@ -4,7 +4,6 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "subtopic")
-//@Serializable
 data class Subtopic(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

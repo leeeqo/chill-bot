@@ -42,11 +42,11 @@ class InterviewPrepareServiceImpl(
         val replyKeyboard: ReplyKeyboard
         val text: String
 
-        processOnReturnChoosingTopicOrSubtopic(currSession, update)
+        processOnChoosingTopicOrSubtopic(currSession, update)
 
         when (currSession.stage) {
             0 -> {
-                currSession.sessionMode.topic = null
+                currSession.sessionMode.topicName = null
 
                 replyKeyboard = processTopic()
                 text = CHOOSE_TOPIC
@@ -55,18 +55,18 @@ class InterviewPrepareServiceImpl(
             }
 
             1 -> {
-                val topicName = currSession.sessionMode.topic ?: update.message.text
+                val topicName = currSession.sessionMode.topicName ?: update.message.text
 
                 replyKeyboard = processSubtopic(topicName)
                 text = CHOOSE_SUBTOPIC
 
                 currSession.stage++
-                currSession.sessionMode.topic = topicName
+                currSession.sessionMode.topicName = topicName
             }
 
             else -> {
-                val subtopicName = currSession.sessionMode.subtopic ?: update.message.text
-                val questionsIds = currSession.sessionMode.questions.toList()
+                val subtopicName = currSession.sessionMode.subtopicName ?: update.message.text
+                val questionsIds = currSession.sessionMode.questionIds.toList()
 
                 val question = processQuestion(subtopicName, questionsIds)
 
@@ -74,7 +74,7 @@ class InterviewPrepareServiceImpl(
                     text = question.text
                     replyKeyboard = generateReplyKeyboardOnQuestion()
 
-                    currSession.sessionMode.questions.add(question.id)
+                    currSession.sessionMode.questionIds.add(question.id)
                 } else {
                     text = "There are no more questions for this subtopic. \n" +
                             "Choose other topic or subtopic"
@@ -84,52 +84,8 @@ class InterviewPrepareServiceImpl(
                     )
                 }
 
-                currSession.sessionMode.subtopic = subtopicName
+                currSession.sessionMode.subtopicName = subtopicName
             }
-
-            /*2 -> {
-                val subtopicName = update.message.text
-
-                val question = processQuestionFirstTime(subtopicName)
-
-                if (question != null) {
-                    text = question.text
-                    replyKeyboard = generateReplyKeyboardOnQuestion()
-
-                    currSession.stage++
-                    currSession.sessionMode.questions.add(question.id)
-                } else {
-                    text = "There are no questions for this subtopic. \n" +
-                            "Choose other topic or subtopic"
-                    replyKeyboard = generateReplyKeyboardWithOptions(listOf(
-                        CHOOSE_TOPIC,
-                        CHOOSE_SUBTOPIC)
-                    )
-                }
-
-                currSession.sessionMode.subtopic = subtopicName
-            }
-
-            else -> {
-                val subtopicName = currSession.sessionMode.subtopic!!
-                val questionsIds = currSession.sessionMode.questions.toList() //currSession.sessionMode.getIdOfQuestions().toList()
-
-                val question = processQuestion(subtopicName, questionsIds)
-
-                if (question != null) {
-                    text = question.text
-                    replyKeyboard = generateReplyKeyboardOnQuestion()
-
-                    currSession.sessionMode.questions.add(question.id)
-                } else {
-                    text = "There are no more questions for this subtopic. \n" +
-                            "Choose other topic or subtopic"
-                    replyKeyboard = generateReplyKeyboardWithOptions(listOf(
-                        CHOOSE_TOPIC,
-                        CHOOSE_SUBTOPIC)
-                    )
-                }
-            }*/
         }
 
         sessionRepository.save(currSession)
@@ -158,7 +114,7 @@ class InterviewPrepareServiceImpl(
         return sessionRepository.save(session)
     }
 
-    private fun processOnReturnChoosingTopicOrSubtopic(currSession: Session, update: Update) {
+    private fun processOnChoosingTopicOrSubtopic(currSession: Session, update: Update) {
         when (update.message.text) {
             CHOOSE_TOPIC -> currSession.stage = 0
             CHOOSE_SUBTOPIC -> currSession.stage = 1
@@ -187,13 +143,6 @@ class InterviewPrepareServiceImpl(
             it?.name ?: "Ooops, subtopic has no name("
         }.toList())
     }
-
-    /*@Transactional
-    private fun processQuestionFirstTime(subtopicName: String): Question? {
-        val questions = questionDAO.findRandBySubtopic(subtopicName)
-
-        return if (questions.isEmpty()) null else questions[0]
-    }*/
 
     @Transactional
     private fun processQuestion(subtopicName: String, questionIds: List<Long>): Question? {

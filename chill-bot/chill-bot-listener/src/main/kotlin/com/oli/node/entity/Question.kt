@@ -4,7 +4,6 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "question")
-//@Serializable
 data class Question(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +22,4 @@ data class Question(
     @ManyToOne//(fetch = FetchType.EAGER)
     @JoinColumn(name = "subtopic_id")
     val subtopic: Subtopic = Subtopic()
-) {
-
-}
+)
