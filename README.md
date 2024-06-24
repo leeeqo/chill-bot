@@ -7,6 +7,10 @@ For example, green means question is successfully learned and yellow means it sh
 
 This bot allows you to repeat questions, choosing topic and subtopic, showing them in random order.
 
+### Features in progress:
+- Saving statistics of each session
+- Exceptions handling
+
 ### Stack:
 - Kotlin
 - Spring
