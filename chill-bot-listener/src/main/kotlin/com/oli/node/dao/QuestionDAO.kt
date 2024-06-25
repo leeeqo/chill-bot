@@ -32,6 +32,6 @@ interface QuestionDAO : JpaRepository<Question, Long> {
             "LIMIT 1")
     fun findRandBySubtopicExceptAlreadyAsked(
         @Param("subtopic_name") subtopicName: String,
-        @Param("already_asked_ids") alreadyAskedIds: Set<Long> //List<Long>
+        @Param("already_asked_ids") alreadyAskedIds: List<Long>
     ) : List<Question>
 }

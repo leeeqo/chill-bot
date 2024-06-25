@@ -1,5 +1,6 @@
 package com.oli.node.utils
 
+import com.oli.node.misc.Answer
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup
@@ -7,12 +8,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow
-
-private val interviewQuestionOptions = listOf(
-    "Good",
-    "Must be repeated",
-    "Don't know"
-)
 
 fun generateReplyKeyboardWithOptions(options: List<String>): ReplyKeyboard {
     val rows = mutableListOf<KeyboardRow>()
@@ -39,6 +34,3 @@ fun generateInlineKeyboardWithOptions(options: List<String>): ReplyKeyboard {
 
     return InlineKeyboardMarkup(rows)
 }
-
-fun generateReplyKeyboardOnQuestion(): ReplyKeyboard =
-    generateReplyKeyboardWithOptions(interviewQuestionOptions)
