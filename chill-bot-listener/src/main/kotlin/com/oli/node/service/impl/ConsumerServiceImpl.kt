@@ -2,7 +2,7 @@ package com.oli.node.service.impl
 
 import com.oli.node.dao.SessionRepository
 import com.oli.node.service.ConsumerService
-import com.oli.node.service.modeServices.InterviewPrepareService
+import com.oli.node.service.InterviewPrepareService
 import com.oli.node.state.Mode.PREPARE_FOR_INTERVIEW
 import com.oli.node.utils.defineModeByText
 import mu.KotlinLogging

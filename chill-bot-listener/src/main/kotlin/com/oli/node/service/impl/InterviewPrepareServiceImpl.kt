@@ -1,12 +1,13 @@
-package com.oli.node.service.modeServices.impl
+package com.oli.node.service.impl
 
 import com.oli.node.dao.QuestionDAO
 import com.oli.node.dao.SessionRepository
 import com.oli.node.dao.SubtopicDAO
 import com.oli.node.dao.TopicDAO
 import com.oli.node.entity.Question
+import com.oli.node.misc.Answer
+import com.oli.node.service.InterviewPrepareService
 import com.oli.node.service.ProducerService
-import com.oli.node.service.modeServices.InterviewPrepareService
 import com.oli.node.state.InterviewSession
 import com.oli.node.state.Session
 import com.oli.node.utils.defineModeByText
@@ -33,6 +34,8 @@ class InterviewPrepareServiceImpl(
     companion object {
         private const val CHOOSE_TOPIC = "Choose topic"
         private const val CHOOSE_SUBTOPIC = "Choose subtopic"
+
+        private val answerVariants: List<String> = Answer.entries.stream().map { it.name }.toList()
     }
 
     override fun processInterviewPrepareMessage(update: Update) {
@@ -66,21 +69,36 @@ class InterviewPrepareServiceImpl(
 
             else -> {
                 val subtopicName = currSession.sessionMode.subtopicName ?: update.message.text
-                val questionsIds = currSession.sessionMode.questionIds.toList()
+                //val questionsIds = currSession.sessionMode.questionIds.toList()
 
-                val question = processQuestion(subtopicName, questionsIds)
+                val answerQuestion = if (update.message.text in answerVariants) {
+                    Answer.valueOf(update.message.text)
+                } else null
+                val alreadyAnsweredIds = currSession.sessionMode.alreadyAnswered.keys
+
+                val question = processQuestion(subtopicName, alreadyAnsweredIds)//questionsIds)
 
                 if (question != null) {
                     text = question.text
                     replyKeyboard = generateReplyKeyboardOnQuestion()
 
-                    currSession.sessionMode.questionIds.add(question.id)
+                    //currSession.sessionMode.questionIds.add(question.id)
+                    if (answerQuestion != null) {
+                        currSession.sessionMode.alreadyAnswered[question.id] = answerQuestion
+                    }
+
+                    kLogger.info { "alreadyAnswered: \n" +
+                            "alreadyAnsweredIds = ${currSession.sessionMode.alreadyAnswered.keys} \n"
+                            "alreadyAnsweredAnswers = ${currSession.sessionMode.alreadyAnswered.values} \n"
+                    }
                 } else {
                     text = "There are no more questions for this subtopic. \n" +
                             "Choose other topic or subtopic"
-                    replyKeyboard = generateReplyKeyboardWithOptions(listOf(
-                        CHOOSE_TOPIC,
-                        CHOOSE_SUBTOPIC)
+                    replyKeyboard = generateReplyKeyboardWithOptions(
+                        listOf(
+                            CHOOSE_TOPIC,
+                            CHOOSE_SUBTOPIC
+                        )
                     )
                 }
 
@@ -145,12 +163,13 @@ class InterviewPrepareServiceImpl(
     }
 
     @Transactional
-    private fun processQuestion(subtopicName: String, questionIds: List<Long>): Question? {
+    private fun processQuestion(subtopicName: String, alreadyAnsweredIds: Set<Long>): Question? {
+        //questionIds: List<Long>): Question? {
         val questions =
-            if (questionIds.isEmpty()) {
+            if (alreadyAnsweredIds.isEmpty()) { //(questionIds.isEmpty()) {
                 questionDAO.findRandBySubtopic(subtopicName)
             } else {
-                questionDAO.findRandBySubtopicExceptAlreadyAsked(subtopicName, questionIds)
+                questionDAO.findRandBySubtopicExceptAlreadyAsked(subtopicName, alreadyAnsweredIds) //questionIds)
             }
 
         return if (questions.isEmpty()) null else questions[0]
