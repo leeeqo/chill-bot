@@ -8,7 +8,7 @@ data class Session (
     val id: String,
     val mode: Mode,
     var stage: Int,
-    val sessionMode: SessionMode,
+    val subSession: SubSession,
     //val randomFactory: RandomFactory = RandomFactory(id)
     //val random: Random = Random(id.hashCode())
 )

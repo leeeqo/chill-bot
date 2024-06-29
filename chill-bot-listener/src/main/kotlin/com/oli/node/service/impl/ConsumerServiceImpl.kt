@@ -33,6 +33,9 @@ class ConsumerServiceImpl(
 
         if (update.message.text == "/end" && currSession.isPresent) {
             sessionRepository.delete(currSession.get())
+
+            // TO_DO - save session to DB
+
             return
         }
 

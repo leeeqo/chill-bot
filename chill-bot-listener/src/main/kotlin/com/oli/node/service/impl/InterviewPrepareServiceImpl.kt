@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage
 import org.telegram.telegrambots.meta.api.objects.Update
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard
+import java.time.LocalDateTime
 
 private val kLogger = KotlinLogging.logger {}
 
@@ -39,7 +40,7 @@ class InterviewPrepareServiceImpl(
 
     override fun processInterviewPrepareMessage(update: Update) {
         val currSession = getCurrentSession(update)
-        currSession.sessionMode as InterviewSession
+        currSession.subSession as InterviewSession
 
         val replyKeyboard: ReplyKeyboard
         val text: String
@@ -48,7 +49,7 @@ class InterviewPrepareServiceImpl(
 
         when (currSession.stage) {
             0 -> {
-                currSession.sessionMode.topicName = null
+                currSession.subSession.topicName = null
 
                 replyKeyboard = processTopic()
                 text = CHOOSE_TOPIC
@@ -57,22 +58,22 @@ class InterviewPrepareServiceImpl(
             }
 
             1 -> {
-                val topicName = currSession.sessionMode.topicName ?: update.message.text
+                val topicName = currSession.subSession.topicName ?: update.message.text
 
                 replyKeyboard = processSubtopic(topicName)
                 text = CHOOSE_SUBTOPIC
 
                 currSession.stage++
-                currSession.sessionMode.topicName = topicName
+                currSession.subSession.topicName = topicName
             }
 
             else -> {
-                val subtopicName = currSession.sessionMode.subtopicName ?: update.message.text
+                val subtopicName = currSession.subSession.subtopicName ?: update.message.text
 
                 if (update.message.text in ANSWER_OPTIONS) {
-                    currSession.sessionMode.answers.add(Answer.from(update.message.text))
+                    currSession.subSession.answers.add(Answer.from(update.message.text))
                 }
-                val alreadyAskedIds = currSession.sessionMode.alreadyAsked
+                val alreadyAskedIds = currSession.subSession.alreadyAsked
 
                 val question = processQuestion(subtopicName, alreadyAskedIds)
 
@@ -80,7 +81,7 @@ class InterviewPrepareServiceImpl(
                     text = question.text
                     replyKeyboard = generateReplyKeyboardWithOptions(ANSWER_OPTIONS)
 
-                    currSession.sessionMode.alreadyAsked.add(question.id)
+                    currSession.subSession.alreadyAsked.add(question.id)
                 } else {
                     text = "There are no more questions for this subtopic. \n" +
                             "Choose other topic or subtopic"
@@ -92,7 +93,7 @@ class InterviewPrepareServiceImpl(
                     )
                 }
 
-                currSession.sessionMode.subtopicName = subtopicName
+                currSession.subSession.subtopicName = subtopicName
             }
         }
 
