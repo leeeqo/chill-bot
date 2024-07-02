@@ -1,4 +1,4 @@
-# Chill-Bot
+# Interview Preparing Bot
 
 Helps you to analyze your level of commitment for interview.
 
